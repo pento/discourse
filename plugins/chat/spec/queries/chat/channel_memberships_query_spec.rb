@@ -78,8 +78,10 @@ describe Chat::ChannelMembershipsQuery do
           end
 
           it "returns the membership if the user still has access through a staff group" do
-            chatters_group.remove(user_1)
+            user_1.update!(admin: true)
             Group.find_by(id: Group::AUTO_GROUPS[:staff]).add(user_1)
+
+            chatters_group.remove(user_1)
 
             memberships = described_class.call(channel: channel_1)
 
