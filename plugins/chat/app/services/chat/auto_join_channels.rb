@@ -87,18 +87,18 @@ module Chat
         RETURNING chat_channel_id, user_id
       SQL
 
-      channel_to_user = Hash.new { |h, k| h[k] = [] }
+      channel_to_users = Hash.new { |h, k| h[k] = [] }
       args = { now:, last_seen_at:, group_ids:, max_users:, group_permissions:, automatic: }
 
       DB
         .query_array(sql, args)
-        .each { |channel_id, user_id| channel_to_user[channel_id] << user_id }
+        .each { |channel_id, user_id| channel_to_users[channel_id] << user_id }
 
       ::Chat::Channel
-        .where(id: channel_to_user.keys)
+        .where(id: channel_to_users.keys)
         .find_each do |channel|
           ::Chat::ChannelMembershipManager.new(channel).recalculate_user_count
-          ::Chat::Publisher.publish_new_channel(channel, channel_to_user[channel.id])
+          ::Chat::Publisher.publish_new_channel(channel, channel_to_users[channel.id])
         end
     end
   end
