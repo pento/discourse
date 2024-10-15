@@ -293,6 +293,24 @@ describe Chat::ChannelMembershipsQuery do
     end
   end
 
+  context "when user is silenced" do
+    fab!(:channel_1) { Fabricate(:category_channel) }
+    fab!(:silenced_user) { Fabricate(:user, silenced_till: 5.days.from_now) }
+
+    before do
+      Chat::UserChatChannelMembership.create(
+        user: silenced_user,
+        chat_channel: channel_1,
+        following: true,
+      )
+    end
+
+    it "doesn’t list silenced users" do
+      memberships = described_class.call(channel: channel_1)
+      expect(memberships).to be_blank
+    end
+  end
+
   context "when user is inactive" do
     fab!(:channel_1) { Fabricate(:category_channel) }
     fab!(:inactive_user)
