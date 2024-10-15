@@ -97,9 +97,8 @@ module Chat
       ::Chat::Channel
         .where(id: channel_to_user.keys)
         .find_each do |channel|
-          users = User.where(id: channel_to_user[channel.id])
           ::Chat::ChannelMembershipManager.new(channel).recalculate_user_count
-          ::Chat::Publisher.publish_new_channel(channel, users)
+          ::Chat::Publisher.publish_new_channel(channel, channel_to_user[channel.id])
         end
     end
   end
