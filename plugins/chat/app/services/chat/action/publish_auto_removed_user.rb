@@ -19,17 +19,18 @@ module Chat
         return if users_removed_map.empty?
 
         users_removed_map.each do |channel_id, all_user_ids|
+          next if all_user_ids.empty?
+
           job_spacer = JobTimeSpacer.new
+
           all_user_ids.in_groups_of(1000, false) do |user_ids|
             job_spacer.enqueue(Jobs::Chat::KickUsersFromChannel, { channel_id:, user_ids: })
           end
 
-          if all_user_ids.any?
-            StaffActionLogger.new(Discourse.system_user).log_custom(
-              "chat_auto_remove_membership",
-              { users_removed: all_user_ids.size, channel_id:, event: },
-            )
-          end
+          StaffActionLogger.new(Discourse.system_user).log_custom(
+            "chat_auto_remove_membership",
+            { users_removed: all_user_ids.size, channel_id:, event: },
+          )
         end
       end
     end
