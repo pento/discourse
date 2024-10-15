@@ -12,7 +12,7 @@ module Chat
     end
 
     # NOTE: keep in sync with `chat_allowed_groups`'s mandatory values
-    STAFF_GROUP_IDS ||= Group::AUTO_GROUPS.values_at(:admins, :moderators, :staff)
+    STAFF_GROUP_IDS = Group::AUTO_GROUPS.values_at(:admins, :moderators, :staff)
 
     def allowed_group_ids
       return if !read_restricted?
