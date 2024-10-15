@@ -4,7 +4,7 @@ module Chat
   class AutoLeaveChannels
     include Service::Base
 
-    ALLOWED_GROUP_PERMISSIONS ||= [
+    ALLOWED_GROUP_PERMISSIONS = [
       CategoryGroup.permission_types[:create_post],
       CategoryGroup.permission_types[:full],
     ]
