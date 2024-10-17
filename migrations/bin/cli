@@ -1,11 +1,10 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "thor"
 require_relative "../lib/migrations"
+require "thor"
 
 module Migrations
-  load_rails_environment
   configure_zeitwerk
   enable_i18n
 
@@ -23,4 +22,4 @@ module Migrations
   end
 end
 
-Migrations::CLI::Application.start
+::Migrations::CLI::Application.start
