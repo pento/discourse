@@ -35,6 +35,25 @@ module Migrations::CLI
         writer = ::Migrations::Database::Schema::TableWriter.new($stdout)
         schema.each { |table| writer.output_table(table) }
       end
+
+      desc "validate", "Validates the schema config file"
+      method_option :db, type: :string, default: "intermediate_db", desc: "Name of the database"
+      def validate
+        require "json_schemer"
+
+        schema_path = File.join(::Migrations.root_path, "config", "json_schemas", "db_schema.json")
+        schema = JSON.load_file(schema_path)
+
+        config_path = File.join(::Migrations.root_path, "config", "#{options[:db]}.yml")
+        config = YAML.load_file(config_path, symbolize_names: true)
+
+        schemer = JSONSchemer.schema(schema)
+        response = schemer.validate(config)
+
+        response.each { |r| puts r.fetch("error") }
+
+        exit(1) if response.any?
+      end
     end
   end
 end

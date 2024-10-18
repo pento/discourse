@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "default": {},
+  "title": "Root Schema",
+  "required": [
+    "output_file_path",
+    "schema"
+  ],
+  "properties": {
+    "output_file_path": {
+      "type": "string"
+    },
+    "schema": {
+      "type": "object",
+      "required": [
+        "tables",
+        "global"
+      ],
+      "properties": {
+        "tables": {
+          "type": "object"
+        },
+        "global": {
+          "type": "object",
+          "properties": {
+            "columns": {
+              "properties": {
+                "modify": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "regex": {
+                        "type": "string",
+                        "format": "regex"
+                      },
+                      "datatype": {
+                        "type": "string",
+                        "enum": [
+                          "integer",
+                          "real",
+                          "text",
+                          "blob"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "datatype"
+                    ],
+                    "oneOf": [
+                      {
+                        "required": [
+                          "name"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "regex"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "exclude": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "tables": {
+              "properties": {
+                "exclude": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
