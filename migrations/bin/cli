@@ -2,6 +2,8 @@
 # frozen_string_literal: true
 
 require_relative "../lib/migrations"
+
+require "colored2"
 require "thor"
 
 module Migrations
