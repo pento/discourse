@@ -33,20 +33,24 @@ module Migrations::Database::Schema
     def filtered_table_names
       existing_table_names = @db.tables.to_set
 
-      @schema_config[:ignored_tables].uniq.sort.each do |name|
-        @errors << "Ignored table does not exist: #{name}" if !existing_table_names.delete?(name)
-      end
+      @schema_config
+        .dig(:global, :exclude_tables)
+        .uniq
+        .sort
+        .each do |name|
+          @errors << "Ignored table does not exist: #{name}" if !existing_table_names.delete?(name)
+        end
 
       existing_table_names
     end
 
     def globally_excluded_columns
-      @globally_excluded_columns ||= @schema_config.dig(:columns, :exclude) || []
+      @globally_excluded_columns ||= @schema_config.dig(:global, :columns, :exclude) || []
     end
 
     def globally_modified_columns
       @globally_modified_columns ||=
-        (@schema_config.dig(:columns, :modify) || []).each do |c|
+        (@schema_config.dig(:global, :columns, :modify) || []).each do |c|
           c[:regex] = Regexp.new(c[:regex])
           c[:datatype] = c[:datatype].to_sym
         end
@@ -55,14 +59,14 @@ module Migrations::Database::Schema
     def filtered_columns_of(table_name, config)
       columns_by_name = @db.columns(table_name).index_by(&:name)
 
-      if (included_columns = config[:included_columns])
+      if (included_columns = config.dig(:columns, :include))
         included_columns.each do |column_name|
           if !columns_by_name.key?(column_name)
             @errors << "Included column not found: #{table_name}.#{column_name}"
           end
         end
         columns_by_name.slice!(*included_columns)
-      elsif (excluded_columns = config[:excluded_columns])
+      elsif (excluded_columns = config.dig(:columns, :exclude))
         excluded_columns.each do |column_name|
           if !columns_by_name.delete(column_name)
             @errors << "Excluded column not found: #{table_name}.#{column_name}"
